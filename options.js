@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusMessage = document.getElementById('statusMessage');
 
     // REPLACE THIS WITH YOUR REAL STRIPE PAYMENT LINK
-    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/YOUR_REAL_LINK_HERE";
+    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/28EdR974P14c4s7gsLeZ208";
 
     // Handle Subscribe button click
     subscribeButton.addEventListener('click', () => {

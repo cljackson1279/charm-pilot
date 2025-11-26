@@ -1,9 +1,7 @@
 // popup.js
 
-// Placeholder for the backend URL. 
-// In production, this would be your Vercel app URL, e.g., "https://your-app.vercel.app/api/generate"
-// For local testing, we use localhost.
-const API_URL = "http://localhost:3000/api/generate";
+// Update this URL with your production Vercel project URL
+const API_URL = "https://<MY-VERCEL-PROJECT>.vercel.app/api/generate";
 
 document.addEventListener('DOMContentLoaded', () => {
     const ppvInput = document.getElementById('ppv-menu');
