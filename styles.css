@@ -1,0 +1,19 @@
+/* styles.css */
+border: 1px solid #ccc;
+border-radius: 4px;
+resize: vertical;
+box-sizing: border-box;
+}
+
+.radio-group {
+  #output-area {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-height: 60px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    color: #333;
+  }
