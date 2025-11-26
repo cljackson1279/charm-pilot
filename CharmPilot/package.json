@@ -1,0 +1,14 @@
+{
+    "name": "dm-closer-ai-backend",
+    "version": "1.0.0",
+    "description": "Backend for DM Closer AI",
+    "main": "api/generate.js",
+    "scripts": {
+        "start": "node api/generate.js",
+        "dev": "vercel dev"
+    },
+    "dependencies": {
+        "openai": "^4.0.0",
+        "dotenv": "^16.0.0"
+    }
+}
