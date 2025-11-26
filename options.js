@@ -1,13 +1,41 @@
 // options.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    const tokenInput = document.getElementById('token-input');
-    const saveBtn = document.getElementById('save-token-btn');
-    const statusMsg = document.getElementById('status-msg');
+    const subscribeButton = document.getElementById('subscribeButton');
+    const accessTokenInput = document.getElementById('accessTokenInput');
+    const saveTokenButton = document.getElementById('saveTokenButton');
+    const statusMessage = document.getElementById('statusMessage');
 
-    // Load saved token
+    // REPLACE THIS WITH YOUR REAL STRIPE PAYMENT LINK
+    const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/YOUR_REAL_LINK_HERE";
+
+    // Handle Subscribe button click
+    subscribeButton.addEventListener('click', () => {
+        window.open(STRIPE_PAYMENT_LINK, '_blank');
+    });
+
+    // Load saved token on startup
     chrome.storage.sync.get(['subscriptionToken'], (result) => {
         if (result.subscriptionToken) {
-            tokenInput.value = result.subscriptionToken;
+            accessTokenInput.value = result.subscriptionToken;
+            statusMessage.textContent = "Access token already saved. CharmPilot is unlocked on this browser.";
+            statusMessage.style.color = "green";
         }
     });
+
+    // Handle Save Token button click
+    saveTokenButton.addEventListener('click', () => {
+        const token = accessTokenInput.value.trim();
+
+        if (!token) {
+            statusMessage.textContent = "Please enter a valid token.";
+            statusMessage.style.color = "red";
+            return;
+        }
+
+        chrome.storage.sync.set({ subscriptionToken: token }, () => {
+            statusMessage.textContent = "Access token saved. CharmPilot is unlocked on this browser.";
+            statusMessage.style.color = "green";
+        });
+    });
+});

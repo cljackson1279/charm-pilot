@@ -8,13 +8,12 @@ const API_URL = "http://localhost:3000/api/generate";
 document.addEventListener('DOMContentLoaded', () => {
     const ppvInput = document.getElementById('ppv-menu');
     const personaRadios = document.getElementsByName('persona');
-    const generateBtn = document.getElementById('generate-btn');
+    const generateButton = document.getElementById('generateReplyButton');
+    const lockedMessage = document.getElementById('lockedMessage');
     const outputArea = document.getElementById('output-area');
-    const subscriptionMsg = document.createElement('div');
-    subscriptionMsg.style.color = 'red';
-    subscriptionMsg.style.marginBottom = '10px';
-    subscriptionMsg.style.display = 'none';
-    document.body.insertBefore(subscriptionMsg, generateBtn);
+
+    // Default state: Locked
+    generateButton.disabled = true;
 
     // Load saved settings and check subscription
     chrome.storage.sync.get(['ppvMenu', 'persona', 'subscriptionToken'], (result) => {
@@ -31,18 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Check subscription
-        const isSubscribed = result.subscriptionToken && result.subscriptionToken.trim().length > 0;
-        if (!isSubscribed) {
-            generateBtn.disabled = true;
-            generateBtn.style.backgroundColor = '#ccc';
-            generateBtn.style.cursor = 'not-allowed';
-            subscriptionMsg.innerHTML = 'Subscribe to unlock CharmPilot. <a href="#" id="open-options">Open Settings</a>';
-            subscriptionMsg.style.display = 'block';
-
-            document.getElementById('open-options').addEventListener('click', (e) => {
-                e.preventDefault();
-                chrome.runtime.openOptionsPage();
-            });
+        const token = result.subscriptionToken;
+        if (!token) {
+            // No token: Keep disabled and show message
+            generateButton.disabled = true;
+            lockedMessage.textContent = "CharmPilot is locked. Go to Settings → Subscription to start your 3-day trial and add your access token.";
+        } else {
+            // Token exists: Enable and clear message
+            generateButton.disabled = false;
+            lockedMessage.textContent = "";
         }
     });
 
@@ -60,9 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Handle Generate Reply click
-    generateBtn.addEventListener('click', () => {
+    generateButton.addEventListener('click', () => {
         outputArea.innerText = "Generating...";
-        generateBtn.disabled = true;
+        generateButton.disabled = true;
 
         // Get current settings
         const currentPPV = ppvInput.value;
@@ -140,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     else scoreVal.style.color = 'blue';
                 }
 
-                generateBtn.disabled = false;
+                generateButton.disabled = false;
 
                 // Send to content script to insert
                 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -156,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Generation failed:", error);
             outputArea.innerText = "Error: " + error.message;
-            generateBtn.disabled = false;
+            generateButton.disabled = false;
         }
     }
 });
