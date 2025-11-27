@@ -1,7 +1,7 @@
 // popup.js
 
 // Update this URL with your production Vercel project URL
-const API_URL = "https://<MY-VERCEL-PROJECT>.vercel.app/api/generate";
+const API_URL = "https://charm-pilot.vercel.app/api/generate";
 
 document.addEventListener('DOMContentLoaded', () => {
     const ppvInput = document.getElementById('ppv-menu');
