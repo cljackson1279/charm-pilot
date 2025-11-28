@@ -22,6 +22,10 @@
     "activeTab",
     "scripting"
   ],
+  "host_permissions": [
+    "https://*.onlyfans.com/*",
+    "https://charm-pilot.vercel.app/*"
+  ],
   "content_scripts": [
     {
       "matches": [
