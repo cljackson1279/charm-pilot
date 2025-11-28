@@ -10,12 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const lockedMessage = document.getElementById('lockedMessage');
     const outputArea = document.getElementById('output-area');
 
-    // Default state: Locked
-    generateButton.disabled = true;
+    // If generateButton is null, log an error and return instead of throwing
+    if (!generateButton) {
+        console.error("CharmPilot: Generate Reply button not found in popup.html");
+        return;
+    }
 
-    // Load saved settings and check subscription
+    // Implement token gating using chrome.storage.sync
     chrome.storage.sync.get(['ppvMenu', 'persona', 'subscriptionToken'], (result) => {
-        if (result.ppvMenu) {
+        // Restore settings if elements exist
+        if (ppvInput && result.ppvMenu) {
             ppvInput.value = result.ppvMenu;
         }
         if (result.persona) {
@@ -29,21 +33,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Check subscription
         const token = result.subscriptionToken;
-        if (!token) {
-            // No token: Keep disabled and show message
-            generateButton.disabled = true;
-            lockedMessage.textContent = "CharmPilot is locked. Go to Settings → Subscription to start your 3-day trial and add your access token.";
-        } else {
+        if (token && token.trim() !== "") {
             // Token exists: Enable and clear message
             generateButton.disabled = false;
-            lockedMessage.textContent = "";
+            if (lockedMessage) lockedMessage.textContent = "";
+        } else {
+            // No token: Keep disabled and show message
+            generateButton.disabled = true;
+            if (lockedMessage) lockedMessage.textContent = "CharmPilot is locked. Go to Settings → Subscription to start your 3-day trial and add your access token.";
         }
     });
 
-    // Save settings when changed
-    ppvInput.addEventListener('input', () => {
-        chrome.storage.sync.set({ ppvMenu: ppvInput.value });
-    });
+    // Save settings when changed (Safely)
+    if (ppvInput) {
+        ppvInput.addEventListener('input', () => {
+            chrome.storage.sync.set({ ppvMenu: ppvInput.value });
+        });
+    }
 
     for (const radio of personaRadios) {
         radio.addEventListener('change', () => {
@@ -53,13 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle Generate Reply click
+    // Attach existing click handler
     generateButton.addEventListener('click', () => {
-        outputArea.innerText = "Generating...";
+        if (outputArea) outputArea.innerText = "Generating...";
         generateButton.disabled = true;
 
         // Get current settings
-        const currentPPV = ppvInput.value;
+        const currentPPV = ppvInput ? ppvInput.value : "";
         let currentPersona = 'flirty';
         for (const radio of personaRadios) {
             if (radio.checked) {
@@ -112,11 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const ppvSuggestion = data.ppvSuggestion;
 
             // Simulate human typing delay (5-15 seconds)
-            outputArea.innerText = "Typing...";
+            if (outputArea) outputArea.innerText = "Typing...";
             const delay = Math.floor(Math.random() * 10000) + 5000; // 5000 to 15000 ms
 
             setTimeout(() => {
-                outputArea.innerText = reply;
+                if (outputArea) outputArea.innerText = reply;
 
                 // Show Heat Score if available
                 if (heatScore !== undefined) {
@@ -124,14 +130,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const scoreVal = document.getElementById('heat-score-val');
                     const suggVal = document.getElementById('ppv-suggestion-val');
 
-                    scoreVal.innerText = heatScore;
-                    suggVal.innerText = ppvSuggestion || "None";
-                    heatArea.style.display = 'block';
+                    if (scoreVal) scoreVal.innerText = heatScore;
+                    if (suggVal) suggVal.innerText = ppvSuggestion || "None";
+                    if (heatArea) heatArea.style.display = 'block';
 
                     // Color code score
-                    if (heatScore >= 85) scoreVal.style.color = 'green';
-                    else if (heatScore >= 50) scoreVal.style.color = 'orange';
-                    else scoreVal.style.color = 'blue';
+                    if (scoreVal) {
+                        if (heatScore >= 85) scoreVal.style.color = 'green';
+                        else if (heatScore >= 50) scoreVal.style.color = 'orange';
+                        else scoreVal.style.color = 'blue';
+                    }
                 }
 
                 generateButton.disabled = false;
@@ -149,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Generation failed:", error);
-            outputArea.innerText = "Error: " + error.message;
+            if (outputArea) outputArea.innerText = "Error: " + error.message;
             generateButton.disabled = false;
         }
     }
